@@ -1,0 +1,25 @@
+{
+    "name": "sunel/dryrun",
+    "description": "Quickly try the demo project of any Android Library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sunel Tr",
+            "email": "sunelbe@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Dryrun\\": "src/"
+        }
+    },
+    "require": {
+		"php": ">=5.5",
+        "symfony/console": "~2.7",
+        "symfony/filesystem": "~2.7",
+        "symfony/process": "~2.7"
+	},
+    "require-dev": {
+        "fabpot/php-cs-fixer": "~1.2"
+    }
+}
