@@ -52,11 +52,11 @@ class Github
 
         $fs = new Filesystem();
 
-        //$fs->remove($tmpdir);
+        $fs->remove($tmpdir);
 
         $process = new Process("git clone $clonable $tmpdir");
 
-        //$process->run();
+        $process->run();
 
         return $tmpdir;
     }

@@ -36,14 +36,17 @@ class RunCommand extends Command
         }
         if (!Android::isHomeDefined()) {
             $output->writeln('<error>WARNING: your <bg=yellow;options=bold>$ANDROID_HOME</> is not defined.</error>');
-            //return;
+
+            return;
         }
 
-        $output->writeln('<info>Cloning into Temp Dir</info>');
+        $output->writeln("\n<info>Cloning into Temp Dir</info>\n");
 
         $repositoryPath = $git->pull();
 
         $androidProject = new Android($repositoryPath);
+
+        $androidProject->setOutputInterface($output);
 
         if (!$androidProject->isValid()) {
             $output->writeln("<error>$url is not a valid android project</error>");
@@ -58,6 +61,6 @@ class RunCommand extends Command
             return;
         }
 
-        $output->writeln("<fg=green>If you want to remove the app you just installed, execute:\n <bg=yellow;options=bold>{$androidProject->getUninstallCommand()}</></>");
+        $output->writeln("\n<fg=green>If you want to remove the app you just installed, execute:\n <bg=yellow;options=bold>{$androidProject->getUninstallCommand()}</></>");
     }
 }

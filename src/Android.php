@@ -2,18 +2,20 @@
 
 namespace Dryrun;
 
-use Dryrun\InvalidPathExcetion;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Android
 {
-	private $basePath;
-	private $settingsGradlePath;
-	private $modules;
-	private $package;
-	private $launcherActivity;
+    private $basePath;
+    private $settingsGradlePath;
+    private $modules;
+    private $package;
+    private $launcherActivity;
+    private $outputInterface;
 
-	public function __construct($path)
+    public function __construct($path)
     {
         $this->basePath = $path;
         $this->setGradlePath();
@@ -27,153 +29,178 @@ class Android
 
     public function isValid()
     {
-    	return file_exists($this->settingsGradlePath);
+        return file_exists($this->settingsGradlePath);
     }
 
-    public function install() 
+    public function install()
     {
-    	list($path, $executeLine)  = $this->sampleProject();
+        list($path, $executeLine) = $this->sampleProject();
 
-    	if ($path == false and $executeLine==false) {
-    		throw new InvalidPathExcetion("Couldn't open, sorry!");
-    	}
+        if ($path == false and $executeLine == false) {
+            throw new InvalidPathExcetion("Couldn't open, sorry!");
+        }
 
-    	$builder = $this->basePath.DS."gradle";
+        $builder = $this->basePath.DS.'gradle';
 
-	    if(file_exists($this->basePath.DS.'gradlew')) {
-	        
-	        #system('chmod +x gradlew')
+        if (file_exists($this->basePath.DS.'gradlew')) {
+            $process = new Process('chmod +x '.$this->basePath.DS.'gradlew');
 
-	        $builder = 'sh '.$this->basePath.DS.' gradlew';
-	    }
+            $process->run();
 
-	    if (file_exists($this->basePath.DS.'gradlew') && $this->isGradleWrapped()){
-	    	#system('gradle wrap')	
-	    }
-        
+            $builder = 'sh '.$this->basePath.DS.' gradlew';
+        }
+
+        if (file_exists($this->basePath.DS.'gradlew') && $this->isGradleWrapped()) {
+            $process = new Process($this->basePath.DS.'gradle wrap ');
+
+            $process->run();
+        }
+
         $this->uninstall();
         $this->removeApplicationId();
-      	$this->removeLocalProperties();
+        $this->removeLocalProperties();
 
-      	#system("#{builder} clean assembleDebug installDebug")
+        $process = new Process($builder.' clean assembleDebug installDebug');
 
-	    #puts "Installing #{@package.green}...\n"
-	    #puts "executing: #{execute_line.green}\n\n"
-	    #system(execute_line)
-        
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                $this->outputInterface->writeln("<error>ERR > .$buffer</error>");
+            } else {
+                $this->outputInterface->writeln("<info>OUT > .$buffer</info>");
+            }
+        });
+
+        $this->outputInterface->writeln("\n<fg=green>Installing {$this->package}...</>");
+        $this->outputInterface->writeln("\n<fg=green>Installing {$executeLine}...</>");
+
+        $process = new Process($executeLine);
+
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                $this->outputInterface->writeln("<error>ERR > .$buffer</error>");
+            } else {
+                $this->outputInterface->writeln("<info>OUT > .$buffer</info>");
+            }
+        });
     }
 
     public function getUninstallCommand()
     {
-     	return "adb uninstall {$this->package}";
+        return "adb uninstall {$this->package}";
     }
-    private function uninstall() 
-    {
-      #system("#{self.get_uninstall_command}") # > /dev/null 2>&1")
-    }
-    private function removeApplicationId() 
-    {
 
+    public function setOutputInterface(OutputInterface $output)
+    {
+        $this->outputInterface = $output;
     }
+
+    private function uninstall()
+    {
+        $process = new Process($this->getUninstallCommand());
+
+        $process->run();
+    }
+
+    private function removeApplicationId()
+    {
+    }
+
     private function removeLocalProperties()
     {
-    	$fileName = $this->basePath.DS.'local.properties';
-    	if(file_exists($fileName)) {
-    		$fs = new Filesystem();
-        	#$fs->remove($fileName);
-    	}
+        $fileName = $this->basePath.DS.'local.properties';
+        if (file_exists($fileName)) {
+            $fs = new Filesystem();
+            $fs->remove($fileName);
+        }
     }
 
     private function isGradleWrapped()
     {
+        if (!file_exists($this->basePath.DS.'gradle/')) {
+            return false;
+        }
 
-      if (!file_exists($this->basePath.DS.'gradle/')) {
-      		return false;
-      }
-
-      return file_exists($this->basePath.DS.'gradle/wrapper/gradle-wrapper.properties') 
-      		&& file_exists($this->basePath.DS.'gradle/wrapper/gradle-wrapper.jar');
-  	}
-    private function sampleProject() 
+        return file_exists($this->basePath.DS.'gradle/wrapper/gradle-wrapper.properties')
+              && file_exists($this->basePath.DS.'gradle/wrapper/gradle-wrapper.jar');
+    }
+    private function sampleProject()
     {
-    	foreach ($this->modules as $module) {
-    		$fullPath = $this->basePath.DS.$module;
+        foreach ($this->modules as $module) {
+            $fullPath = $this->basePath.DS.$module;
 
-    		$executeLine = $this->getExecuteLine($fullPath.DS.'src'.DS.'main'.DS.'AndroidManifest.xml');
-    		if($executeLine){
-    			return [$fullPath, $executeLine];	
-    		}
-    	}
-    	return [false,false];
+            $executeLine = $this->getExecuteLine($fullPath.DS.'src'.DS.'main'.DS.'AndroidManifest.xml');
+            if ($executeLine) {
+                return [$fullPath, $executeLine];
+            }
+        }
+
+        return [false,false];
     }
 
     private function getExecuteLine($pathToSample)
-    {	
-    	if(!file_exists($pathToSample)){
-    		return false;
-    	}
-
-    	$handle = fopen($pathToSample, "r");
-		$contents = fread($handle, filesize($pathToSample));
-		$doc = simplexml_load_string($contents);
-
-		$this->package = $this->getPackage($doc);
-        $this->launcherActivity = $this->getLauncherActivity($doc);
-
-        if(!$this->launcherActivity) {
-        	return false;
+    {
+        if (!file_exists($pathToSample)) {
+            return false;
         }
 
-		fclose($handle);
+        $handle = fopen($pathToSample, 'r');
+        $contents = fread($handle, filesize($pathToSample));
+        $doc = simplexml_load_string($contents);
 
+        $this->package = $this->getPackage($doc);
+        $this->launcherActivity = $this->getLauncherActivity($doc);
 
-		return "adb shell am start -n \"{$this->getLaunchableActivity()}\" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER";
+        if (!$this->launcherActivity) {
+            return false;
+        }
 
+        fclose($handle);
+
+        return "adb shell am start -n \"{$this->getLaunchableActivity()}\" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER";
     }
 
-    private function setGradlePath() 
+    private function setGradlePath()
     {
-    	$this->settingsGradlePath = $this->basePath.DS.'settings.gradle';
+        $this->settingsGradlePath = $this->basePath.DS.'settings.gradle';
     }
-    
+
     private function setModules()
     {
-    	if ($this->isValid()) {
-			$handle = fopen($this->settingsGradlePath, "rb");
-			$contents = fread($handle, filesize($this->settingsGradlePath));
+        if ($this->isValid()) {
+            $handle = fopen($this->settingsGradlePath, 'rb');
+            $contents = fread($handle, filesize($this->settingsGradlePath));
 
-			preg_match_all("/'([^']*)'/",$contents,$matches,PREG_SET_ORDER);
+            preg_match_all("/'([^']*)'/", $contents, $matches, PREG_SET_ORDER);
 
-			fclose($handle);
+            fclose($handle);
 
-			$matches = array_map(function($value) {
-				return str_replace(':','/',$value[1]);
-			},$matches);
+            $matches = array_map(function ($value) {
+                return str_replace(':', '/', $value[1]);
+            }, $matches);
 
-			$this->modules = $matches;
-    	} 
+            $this->modules = $matches;
+        }
     }
 
-    private function getLaunchableActivity() 
+    private function getLaunchableActivity()
     {
-    	$fullPathToLauncher = $this->package.str_replace($this->package,'',$this->launcherActivity);
+        $fullPathToLauncher = $this->package.str_replace($this->package, '', $this->launcherActivity);
 
-      	return $this->package.DS.$fullPathToLauncher;
+        return $this->package.DS.$fullPathToLauncher;
     }
 
-    private function getPackage($doc) 
+    private function getPackage($doc)
     {
-    	return (string)$doc->attributes()['package'];
-    	
-    } 
-    private function getLauncherActivity($doc) 
+        return (string) $doc->attributes()['package'];
+    }
+    private function getLauncherActivity($doc)
     {
-    	foreach ($doc->xpath('application/activity') as $activity) {
-    		if(count($activity->xpath('intent-filter'))) {
-    			return (string)$activity->xpath('@android:name')[0];
-    		}
-    	}
+        foreach ($doc->xpath('application/activity') as $activity) {
+            if (count($activity->xpath('intent-filter'))) {
+                return (string) $activity->xpath('@android:name')[0];
+            }
+        }
 
-    	return false;
+        return false;
     }
 }
