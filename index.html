@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dryrun-php by sunel</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Dryrun-php</h1>
+        <p class="header">Quickly try the demo project of any Android Library written in PHP</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/sunel/DryRun-PHP/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/sunel/DryRun-PHP/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/sunel/DryRun-PHP">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/sunel">sunel</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="dryrun-in-php-just-for-fun" class="anchor" href="#dryrun-in-php-just-for-fun" aria-hidden="true"><span class="octicon octicon-link"></span></a>dryrun in PHP (JUST FOR FUN)</h1>
+
+<p>This is complete PHP Port of orginal ruby version <a href="https://github.com/cesarferreira/dryrun">dryrun</a> by <a href="https://github.com/cesarferreira">cesarferreira</a></p>
+
+<blockquote>
+<p>Did this as a fun project <img class="emoji" title=":stuck_out_tongue_winking_eye:" alt=":stuck_out_tongue_winking_eye:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f61c.png" height="20" width="20" align="absmiddle"> <img class="emoji" title=":smirk:" alt=":smirk:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60f.png" height="20" width="20" align="absmiddle"> </p>
+</blockquote>
+
+<p><strong>Try</strong> any <strong>android library</strong> on your <strong>smartphone</strong> <strong>directly</strong> from the <strong>command line</strong></p>
+
+<blockquote>
+<p>A dry run is a testing process where the effects of a possible failure are intentionally mitigated. For example, an aerospace company may conduct a "dry run" test of a jet's new pilot ejection seat while the jet is parked on the ground, rather than while it is in flight.</p>
+</blockquote>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cesarferreira/dryrun/master/extras/usage.gif" width="100%">
+</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<blockquote>
+<p>dryrun <a href="https://github.com/cesarferreira/android-helloworld">https://github.com/cesarferreira/android-helloworld</a></p>
+</blockquote>
+
+<p>Wait a few seconds... and <code>voilà</code>! The app is opened on your phone <img class="emoji" title=":smiley:" alt=":smiley:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f603.png" height="20" width="20" align="absmiddle"></p>
+
+<h3>
+<a id="goodies" class="anchor" href="#goodies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goodies</h3>
+
+<ul>
+<li>
+<p>Private repos can be tested too <img class="emoji" title=":smiley:" alt=":smiley:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f603.png" height="20" width="20" align="absmiddle"></p>
+
+<ul>
+<li><p>assuming that you have the corresponding <code>private ssh keys</code> in your <code>~./ssh/</code></p></li>
+<li><blockquote>
+<p>$ dryrun <a href="mailto:git@github.com">git@github.com</a>:cesarferreira/android-helloworld.git</p>
+</blockquote></li>
+</ul>
+</li>
+<li>
+<p>No need to cleanup after you test the library.</p>
+
+<ul>
+<li>Your operating system will clean the /tmp/ folder for you.</li>
+</ul>
+</li>
+<li><p>No need to wait for <strong>Android Studio</strong> to load.</p></li>
+</ul>
+
+<h2>
+<a id="alternative-scenario-if-you-dont-use-dryrun" class="anchor" href="#alternative-scenario-if-you-dont-use-dryrun" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternative scenario (if you don't use <code>dryrun</code>)</h2>
+
+<ol>
+<li>Find the github's repository url</li>
+<li>Click the <code>download zip</code>
+</li>
+<li>Extract the <code>zip file</code>
+</li>
+<li>Open Android Studio</li>
+<li>Import the project you just downloaded</li>
+<li>Sync gradle</li>
+<li>Run the project</li>
+<li>Choose the device you want to run</li>
+<li>Test all you want</li>
+<li>Delete the <code>project folder</code> and the <code>zip file</code> when you don't want it anymore</li>
+</ol>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<div class="highlight highlight-shell"><pre>    $ wget http://sunel.github.io/dryrun.phar -O dryrun</pre></div>
+
+<p>OR</p>
+
+<div class="highlight highlight-shell"><pre>    $ curl http://sunel.github.io/dryrun.phar -O dryrun</pre></div>
+
+<p>then </p>
+
+<div class="highlight highlight-shell"><pre>    $ sudo chmod a+x dryrun
+    $ sudo mv dryrun /usr/local/bin/dryrun</pre></div>
+
+<p><strong>Requirements <code>(if you haven't already)</code>:</strong></p>
+
+<blockquote>
+<p>$ANDROID_HOME defined on the environment variables <a href="http://stackoverflow.com/questions/5526470/trying-to-add-adb-to-path-variable-osx">(how-to)</a></p>
+
+<p>Android SDK in your $PATH <a href="http://stackoverflow.com/questions/19986214/setting-android-home-enviromental-variable-on-mac-os-x">(how-to)</a></p>
+</blockquote>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>Bug reports and pull requests are welcome on GitHub at <a href="https://github.com/sunel/DryRun-PHP">https://github.com/sunel/DryRun-PHP</a>.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
