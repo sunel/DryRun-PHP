@@ -47,8 +47,20 @@ Wait a few seconds... and `voilà`! The app is opened on your phone :smiley:
 
 ## Installation
 
-    $ gem install dryrun
+```shell
+    $ wget http://sunel.github.io/dryrun.phar -O dryrun
+```
+OR
 
+```shell
+    $ curl http://sunel.github.io/dryrun.phar -O dryrun
+```
+then 
+
+```shell
+	$ sudo chmod a+x dryrun
+	$ sudo mv dryrun /usr/local/bin/dryrun
+```
 
 **Requirements `(if you haven't already)`:**
 
