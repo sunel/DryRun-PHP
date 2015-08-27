@@ -14,6 +14,7 @@ class Android
     private $package;
     private $launcherActivity;
     private $outputInterface;
+    private $pathToSample;
 
     public function __construct($path)
     {
@@ -103,6 +104,23 @@ class Android
 
     private function removeApplicationId()
     {
+        $tmpfname = tempnam(sys_get_temp_dir(), 'FOO');
+        $temp = fopen($tmpfname, 'w');
+
+        $file = $this->pathToSample.DS.'build.gradle';
+        $handle = fopen($file, 'r');
+
+        while (($line = fgets($handle)) !== false) {
+            if (strpos($line, 'applicationId') === false) {
+                fwrite($temp, $line);
+            }
+        }
+
+        fclose($handle);
+        fclose($temp);
+
+        $fs = new Filesystem();
+        $fs->rename($tmpfname, $file);
     }
 
     private function removeLocalProperties()
@@ -126,7 +144,7 @@ class Android
     private function sampleProject()
     {
         foreach ($this->modules as $module) {
-            $fullPath = $this->basePath.DS.$module;
+            $this->pathToSample = $fullPath = $this->basePath.DS.$module;
 
             $executeLine = $this->getExecuteLine($fullPath.DS.'src'.DS.'main'.DS.'AndroidManifest.xml');
             if ($executeLine) {
